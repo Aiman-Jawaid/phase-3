@@ -1,0 +1,73 @@
+# Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudio,python,node
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudio,python,node
+
+### Windows ###
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Dump file
+*.dump
+
+# Windows Installer files
+*.msi
+*.msp
+*.local
+
+# Windows shortcuts
+*.lnk
+
+# End of https://www.toptal.com/developers/gitignore/api/windows,visualstudio,python,node
+
+# Additional ignores for this project
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.DS_Store
+.pytest_cache/
+.hypothesis/
+
+# Ignore IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Ignore environment variables and sensitive data
+.env
+todo.db
+*.db-journal
+
+# Ignore the problematic nul file
+nul
+
+# Ignore node modules
+node_modules/
+
+# Ignore backend database
+backend/todo.db

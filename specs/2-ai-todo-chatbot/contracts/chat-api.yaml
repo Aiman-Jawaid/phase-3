@@ -1,0 +1,188 @@
+openapi: 3.0.0
+info:
+  title: AI Todo Chatbot API
+  description: API for the AI-powered Todo Chatbot that allows users to manage tasks using natural language
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /api/chat:
+    post:
+      summary: Send a message to the AI chatbot
+      description: |
+        Sends a user message to the AI chatbot and receives a response.
+        The chatbot will interpret the natural language and perform appropriate task operations.
+        Requires authentication via JWT token.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+            example:
+              conversation_id: "123e4567-e89b-12d3-a456-426614174000"
+              message: "Add a task to buy groceries"
+      responses:
+        '200':
+          description: Successful response from the chatbot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+              example:
+                conversation_id: "123e4567-e89b-12d3-a456-426614174000"
+                response: "I've added the task 'buy groceries' to your list."
+                tool_calls: ["add_task"]
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Unprocessable Entity - Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - message
+      properties:
+        conversation_id:
+          type: string
+          format: uuid
+          description: Optional ID of an existing conversation. If not provided, a new conversation is created.
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        message:
+          type: string
+          description: The user's message to the chatbot
+          example: "Show me my pending tasks"
+          minLength: 1
+          maxLength: 2000
+
+    ChatResponse:
+      type: object
+      required:
+        - conversation_id
+        - response
+      properties:
+        conversation_id:
+          type: string
+          format: uuid
+          description: The ID of the conversation
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        response:
+          type: string
+          description: The chatbot's response to the user
+          example: "Here are your pending tasks: 1. Buy groceries, 2. Call mom"
+        tool_calls:
+          type: array
+          items:
+            type: string
+          description: Array of MCP tools that were called during processing
+          example: ["list_tasks"]
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Invalid JWT token"
+        details:
+          type: object
+          description: Additional error details
+          example: {"reason": "expired_token"}
+
+    Conversation:
+      type: object
+      required:
+        - id
+        - user_id
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the conversation
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user who owns this conversation
+          example: "987fcdeb-51a2-43a3-8d8d-9f4c3b5b2c1a"
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the conversation was created
+          example: "2023-10-20T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the conversation was last updated
+          example: "2023-10-20T10:30:00Z"
+
+    Message:
+      type: object
+      required:
+        - id
+        - conversation_id
+        - user_id
+        - role
+        - content
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the message
+          example: "abc123de-4567-89ab-cdef-123456789012"
+        conversation_id:
+          type: string
+          format: uuid
+          description: ID of the conversation this message belongs to
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user who sent this message
+          example: "987fcdeb-51a2-43a3-8d8d-9f4c3b5b2c1a"
+        role:
+          type: string
+          enum: [user, assistant]
+          description: Indicates whether the message was sent by user or assistant
+          example: "user"
+        content:
+          type: string
+          description: The content of the message
+          example: "Add a task to buy groceries"
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the message was created
+          example: "2023-10-20T10:15:00Z"
